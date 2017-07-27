@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-tinker" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/07/27/tinker/" class="article-date">
+  <time datetime="2017-07-27T06:26:41.719Z" itemprop="datePublished">2017-07-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/07/27/tinker/">使用Tinker与极光推送实现Android热更新</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="一、Tinker平台的配置"><a href="#一、Tinker平台的配置" class="headerlink" title="一、Tinker平台的配置"></a>一、Tinker平台的配置</h2><p>Tinker的注册不做赘述，打开<a href="http://www.tinkerpatch.com/Apps/index" target="_blank" rel="external">Tinker Platform</a>App管理界面，新增自己的App。输入App名称新增成功之后会进入到App详情界面，这个界面左侧的appKey在下面的配置中会用到。</p>
+<h2 id="二、Tinker在AndroidStudio上的配置与初始化"><a href="#二、Tinker在AndroidStudio上的配置与初始化" class="headerlink" title="二、Tinker在AndroidStudio上的配置与初始化"></a>二、Tinker在AndroidStudio上的配置与初始化</h2><h3 id="1-配置gradle文件："><a href="#1-配置gradle文件：" class="headerlink" title="1.配置gradle文件："></a>1.配置gradle文件：</h3><p>1）打开build.gradle，添加版本库与依赖包：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">buildscript</span> &#123;</div><div class="line">    <span class="keyword">repositories</span> &#123;</div><div class="line">        mavenCentral()</div><div class="line">        jcenter()</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">dependencies</span> &#123;</div><div class="line">        <span class="keyword">classpath</span> <span class="string">"com.tinkerpatch.sdk:tinkerpatch-gradle-plugin:1.1.7"</span></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">dependencies</span> &#123;</div><div class="line">    。。。</div><div class="line">    provided <span class="string">'com.tinkerpatch.tinker:tinker-android-anno:1.7.11'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.tinkerpatch.sdk:tinkerpatch-android-sdk:1.1.7'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.android.support:multidex:1.0.1'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>2）在build.gradle所在目录下新建tinkerpatch.gradle，添加如下内容：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line">apply plugin: <span class="string">'tinkerpatch-support'</span></div><div class="line"></div><div class="line"><span class="keyword">def</span> bakPath = <span class="keyword">file</span>(<span class="string">"$&#123;buildDir&#125;/bakApk/"</span>)</div><div class="line"><span class="keyword">def</span> baseInfo = <span class="string">"app-1.0.2-0721-09-46-04"</span> <span class="comment">// 这个值是生成patch的对比包</span></div><div class="line"><span class="keyword">def</span> variantName = <span class="string">"release"</span></div><div class="line"></div><div class="line">tinkerpatchSupport &#123;</div><div class="line">    tinkerEnable = <span class="keyword">true</span></div><div class="line">    reflectApplication = <span class="keyword">false</span></div><div class="line">    autoBackupApkPath = <span class="string">"$&#123;bakPath&#125;"</span></div><div class="line">    appKey = <span class="string">"your appkey"</span></div><div class="line">    <span class="comment">/** 注意:appVersion是当前app的版本号，若发布新的全量包, appVersion一定要更新 **/</span></div><div class="line">    appVersion = <span class="string">"1.0.2"</span></div><div class="line"></div><div class="line">    <span class="keyword">def</span> pathPrefix = <span class="string">"$&#123;bakPath&#125;/$&#123;baseInfo&#125;/$&#123;variantName&#125;/"</span></div><div class="line">    <span class="keyword">def</span> name = <span class="string">"$&#123;project.name&#125;-$&#123;variantName&#125;"</span></div><div class="line">    baseApkFile = <span class="string">"$&#123;pathPrefix&#125;/$&#123;name&#125;.apk"</span></div><div class="line">    baseProguardMappingFile = <span class="string">"$&#123;pathPrefix&#125;/$&#123;name&#125;-mapping.txt"</span></div><div class="line">    baseResourceRFile = <span class="string">"$&#123;pathPrefix&#125;/$&#123;name&#125;-R.txt"</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">android &#123;</div><div class="line">    defaultConfig &#123;</div><div class="line">        buildConfigField <span class="string">"boolean"</span>, <span class="string">"TINKER_ENABLE"</span>, <span class="string">"$&#123;tinkerpatchSupport.tinkerEnable&#125;"</span></div><div class="line">    &#125;</div><div class="line">    signingConfigs &#123; <span class="comment">// 签名文件的配置</span></div><div class="line">        release &#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                storeFile <span class="keyword">file</span>(<span class="string">"your store file"</span>)</div><div class="line">                storePassword <span class="string">"your store password"</span></div><div class="line">                keyAlias <span class="string">"your key alias"</span></div><div class="line">                keyPassword <span class="string">"your key password"</span></div><div class="line">            &#125; <span class="keyword">catch</span> (ex) &#123;</div><div class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> InvalidUserDataException(ex.toString())</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    buildTypes &#123;</div><div class="line">        release &#123;</div><div class="line">            signingConfig signingConfigs.release</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">/** 以下配置不用做修改 **/</span></div><div class="line">tinkerPatch &#123;</div><div class="line">    ignoreWarning = <span class="keyword">false</span></div><div class="line">    useSign = <span class="keyword">true</span></div><div class="line">    dex &#123;</div><div class="line">        dexMode = <span class="string">"jar"</span></div><div class="line">        pattern = [<span class="string">"classes*.dex"</span>]</div><div class="line">        loader = []</div><div class="line">    &#125;</div><div class="line">    lib &#123;</div><div class="line">        pattern = [<span class="string">"lib/*/*.so"</span>]</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    res &#123;</div><div class="line">        pattern = [<span class="string">"res/*"</span>, <span class="string">"r/*"</span>, <span class="string">"assets/*"</span>, <span class="string">"resources.arsc"</span>, <span class="string">"AndroidManifest.xml"</span>]</div><div class="line">        ignoreChange = []</div><div class="line">        largeModSize = <span class="number">100</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    packageConfig &#123;</div><div class="line">    &#125;</div><div class="line">    sevenZip &#123;</div><div class="line"><span class="comment">//        zipArtifact = "com.tencent.mm:SevenZip:1.1.10"</span></div><div class="line">    &#125;</div><div class="line">    buildConfig &#123;</div><div class="line">        keepDexApply = <span class="keyword">false</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>3）在build.gradle中通过<code>apply from: &#39;tinkerpatch.gradle&#39;</code>引入tinkerpatch.gradle</p>
+<h3 id="2-Tinker在Android工程里的初始化"><a href="#2-Tinker在Android工程里的初始化" class="headerlink" title="2.Tinker在Android工程里的初始化"></a>2.Tinker在Android工程里的初始化</h3><p>1）新建ApplicationLike文件，并在这个文件中对Tinker进行初始化配置<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyApplicationLike</span> <span class="keyword">extends</span> <span class="title">DefaultApplicationLike</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"sglei-tinker"</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyApplicationLike</span><span class="params">(Application application, <span class="keyword">int</span> tinkerFlags, <span class="keyword">boolean</span> tinkerLoadVerifyFlag,</span></span></div><div class="line">                             <span class="keyword">long</span> applicationStartElapsedTime, <span class="keyword">long</span> applicationStartMillisTime, Intent tinkerResultIntent) &#123;</div><div class="line">        <span class="keyword">super</span>(application, tinkerFlags, tinkerLoadVerifyFlag, applicationStartElapsedTime, applicationStartMillisTime, tinkerResultIntent);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@TargetApi</span>(Build.VERSION_CODES.ICE_CREAM_SANDWICH)</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBaseContextAttached</span><span class="params">(Context base)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onBaseContextAttached(base);</div><div class="line">        MultiDex.install(base);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate();</div><div class="line">        initTinker();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initTinker</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (BuildConfig.TINKER_ENABLE) &#123;</div><div class="line">            TinkerPatch.init(<span class="keyword">this</span>)</div><div class="line">                    .reflectPatchLibrary()</div><div class="line">                    .setPatchRollbackOnScreenOff(<span class="keyword">true</span>)</div><div class="line">                    .setPatchRestartOnSrceenOff(<span class="keyword">true</span>)</div><div class="line">                    .setFetchPatchIntervalByHours(<span class="number">3</span>)</div><div class="line">                    .setPatchResultCallback(<span class="keyword">new</span> ResultCallBack() &#123;</div><div class="line">                        <span class="meta">@Override</span></div><div class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPatchResult</span><span class="params">(PatchResult patchResult)</span> </span>&#123;</div><div class="line">                            Log.i(TAG, <span class="string">"补丁安装结果："</span> + patchResult.toString());</div><div class="line">                        &#125;</div><div class="line">                    &#125;);</div><div class="line">            Log.d(TAG, <span class="string">"current patch version is "</span> + TinkerPatch.with().getPatchVersion());</div><div class="line">            TinkerPatch.with().fetchPatchUpdateAndPollWithInterval();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>2）新建自己的Application文件，这个Application继承自com.tencent.tinker.loader.app.TinkerApplication，而不是android.app.Application<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyApplication</span> <span class="keyword">extends</span> <span class="title">TinkerApplication</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyApplication</span><span class="params">()</span> </span>&#123;</div><div class="line">      <span class="keyword">super</span>(ShareConstants.TINKER_ENABLE_ALL, <span class="string">"com.fablesmart.pagc.MyApplicationLike"</span>);<span class="comment">//这里修改为上面自己的ApplicationLike路径</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>此时，Tinker的配置已经全部完成，TinkerPatch.with().fetchPatchUpdateAndPollWithInterval()会通过初始化中setFetchPatchIntervalByHours(3)设置的3小时轮询一次的频率向TinkerPlatform请求patch，如果有新的patch，便会下载与更新。若更新成功，在下一次启动App时，更新的patch会生效。</p>
+<p>考虑到用户使用期间，我们下发了patch，如果用户使用的时间小于上面设置的interval，便很有可能执行不到请求patch的操作。为了保证patch的及时性，也就是保证用户不需要重启两次app才能完成更新，下发补丁的时候，我们使用极光推送自定义消息来通知app请求patch。</p>
+<h2 id="三、JPush的配置"><a href="#三、JPush的配置" class="headerlink" title="三、JPush的配置"></a>三、JPush的配置</h2><p>极光推送的在AndroidStudio上的配置详见<a href="https://docs.jiguang.cn/jpush/client/Android/android_guide/" target="_blank" rel="external">极光推送SDK集成指南</a><br>关于Tinker，我们所做的修改是新建一个接收器。代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyReceiver</span> <span class="keyword">extends</span> <span class="title">BroadcastReceiver</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceive</span><span class="params">(Context context, Intent intent)</span> </span>&#123;</div><div class="line">        Bundle bundle = intent.getExtras();</div><div class="line">        String content = bundle.getString(JPushInterface.EXTRA_MESSAGE);</div><div class="line">        Log.d(<span class="string">"sglei-tinker"</span>, <span class="string">"jpush content = "</span> + content);</div><div class="line">	<span class="comment">// JPush推送的消息如果包含tinker字符，便向TinkerPlatform请求patch并更新。</span></div><div class="line">        <span class="keyword">if</span> (content.contains(<span class="string">"tinker"</span>)) &#123;</div><div class="line">            TinkerPatch.with().fetchPatchUpdate(<span class="keyword">true</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>MyRecevier在AndroidManifest的配置如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">receiver</span></span></div><div class="line">    <span class="attr">android:name</span>=<span class="string">".MyReceiver"</span></div><div class="line">    <span class="attr">android:exported</span>=<span class="string">"false"</span></div><div class="line">    <span class="attr">android:enabled</span>=<span class="string">"true"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"cn.jpush.android.intent.REGISTRATION"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"cn.jpush.android.intent.MESSAGE_RECEIVED"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"cn.jpush.android.intent.NOTIFICATION_RECEIVED"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"cn.jpush.android.intent.NOTIFICATION_OPENED"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"cn.jpush.android.intent.CONNECTION"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">"your application id"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h2 id="三、Tinker与JPush实现热更新的完整操作流程。"><a href="#三、Tinker与JPush实现热更新的完整操作流程。" class="headerlink" title="三、Tinker与JPush实现热更新的完整操作流程。"></a>三、Tinker与JPush实现热更新的完整操作流程。</h2><h3 id="1-生成release版本的oldApk"><a href="#1-生成release版本的oldApk" class="headerlink" title="1.生成release版本的oldApk"></a>1.生成release版本的oldApk</h3><p>生成apk的方法有两种：a)打开AndroidStudio的Terminal控制台，输入命令“gradlew assembleRelease”；b)打开AndroidStudio右侧的Gradle侧边栏，双击root目录下的Tasks/build/assembleRelease。<br>根据tinkerpatch.gradle的配置，会在app/build/bakApk目录下生成一个当前日期的app文件夹，文件夹包括release版本的apk。这个apk可以看做包含bug的签名包，也就是我们的oldApk。</p>
+<h3 id="2-生成Tinker补丁包"><a href="#2-生成Tinker补丁包" class="headerlink" title="2.生成Tinker补丁包"></a>2.生成Tinker补丁包</h3><p>我们修复上述apk的bug，这里的修复可以修改java文件、assets与res下的资源文件等。代码与资源文件修改完成后，<strong>需要将tinkerpatch.gradle中的baseInfo改成oldApk所在的文件夹</strong>。<br>生成patch的方法也是两种：a)打开Terminal控制台，执行“gradlew tinkerPatchRelease”；B)双击root目录下的Tasks/tinker/tinkerPatchRelease。<br>根据tinkerpatch.gradle的配置，会在app/build/bakApk目录下生成release版本的已修复bug的新apk，并在<strong>app/build/outputs/tinkerPatch/release文件夹下生成补丁包patch_signed.apk</strong>。</p>
+<h3 id="3-上传Tinker补丁包并发布"><a href="#3-上传Tinker补丁包并发布" class="headerlink" title="3.上传Tinker补丁包并发布"></a>3.上传Tinker补丁包并发布</h3><p>1）打开TinkerPlatform的App详情页，若oldApk的版本号还未添加到该App中，点击“添加app版本”，输入版本号（这里的版本后必须和oldApk的版本号保持一致，否则oldApk读取不到我们上传到该版本的patch）。<br>2）点击刚刚添加的版本号，点击“选择文件”，将刚刚生成的patch_signed.apk上传，点击“提交”，该patch即上传成功。</p>
+<h3 id="4-JPush发送一条包含”tinker”字符的自定义消息"><a href="#4-JPush发送一条包含”tinker”字符的自定义消息" class="headerlink" title="4.JPush发送一条包含”tinker”字符的自定义消息"></a>4.JPush发送一条包含”tinker”字符的自定义消息</h3><p>打开JPush控制台，创建一条自定义消息，并将发送内容填为“tinker”。发送该自定义消息。</p>
+<h3 id="5-重启App，patch生效"><a href="#5-重启App，patch生效" class="headerlink" title="5.重启App，patch生效"></a>5.重启App，patch生效</h3><p>App会上面发送的自定义消息，并执行<code>TinkerPatch.with().fetchPatchUpdate(true)</code>。<br>若补丁包安装成功，下次启动App的时候，oldApk所含的bug已经修复。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/07/27/tinker/" data-id="cj5m23jzb0001isumif9zmj8y" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/07/27/hello-world/" class="article-date">
+  <time datetime="2017-07-27T06:23:56.539Z" itemprop="datePublished">2017-07-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/07/27/hello-world/">Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/07/27/hello-world/" data-id="cj5m2195t0000isumsslt2sse" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/07/27/tinker/">使用Tinker与极光推送实现Android热更新</a>
+          </li>
+        
+          <li>
+            <a href="/2017/07/27/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
